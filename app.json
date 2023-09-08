@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "react-native-native-base",
-    "slug": "react-native-native-base",
+    "name": "Food Recipe",
+    "slug": "food-recipe",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/FoodRecipe.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#EFC81A"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -17,15 +17,29 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sandriirawan.reactnativenativebase"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.sandriirawan.reactnativenativebase"
     },
     "scheme": "acme",
-    "web": { "bundler": "metro" }
+    "web": {
+      "bundler": "metro"
+    },
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "868c002b-38ea-4620-946e-2c0c13473f72"
+      }
+    }
   }
 }
