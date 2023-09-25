@@ -76,9 +76,6 @@ REACT_APP_BACKEND = [BACKEND_URL]
 <!-- ROADMAP -->
 
 ## Screenshots
-![Screenshot_1694342485]()
-![Screenshot_1694342537]()
-
 <table>
  <tr>
     <td><img width="350px" src="https://github.com/sandriirawan/Fe_Food_Recipe_RN/assets/80002249/53e79f73-e3cf-441f-bcd6-0a969222ca47"  border="0" border="0" alt="1" /></td>
