@@ -9,8 +9,8 @@ import { useRoute, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TouchableOpacity } from "react-native";
 import { useDispatch } from "react-redux";
-import { API_URL } from "@env";
-
+import { EXPO_PUBLIC_API_URL } from "@env";
+import { Skeleton } from "native-base";
 
 export default function Profile() {
   const route = useRoute();
@@ -23,7 +23,7 @@ export default function Profile() {
     const fetchUserData = async () => {
       try {
         const response = await axios.get(
-          `${API_URL}/users/${userId}`
+          `${EXPO_PUBLIC_API_URL}/users/${userId}`
         );
         setData(response.data.data[0]);
       } catch (error) {
@@ -95,10 +95,10 @@ export default function Profile() {
           <View style={styles.wrap}>
             {data && (
               <View style={{ marginTop: 80 }}>
-                {data.photo ? (
+                {data?.photo ? (
                   <Image
                     style={{ width: 94, height: 94, borderRadius: 47 }}
-                    source={{ uri: data.photo }}
+                    source={{ uri: data?.photo }}
                   />
                 ) : (
                   <FeatherIcon
@@ -114,7 +114,6 @@ export default function Profile() {
                     }}
                   />
                 )}
-
                 <Text
                   style={{
                     color: "white",
@@ -215,12 +214,8 @@ const styles = StyleSheet.create({
     height: 500,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    // shadowOffset: { width: 0, height: 2 },
-    // shadowOpacity: 0.1,
-    // shadowRadius: 4,
-    // shadowColor: "#000000",
     marginTop: -50,
-    marginLeft: 25,
+    marginHorizontal: 15,
   },
   row: {
     flexDirection: "row",

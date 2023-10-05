@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, ScrollView, Image } from "react-native";
 import {
   NativeBaseProvider,
@@ -10,6 +10,8 @@ import {
   Stack,
   TextArea,
   useToast,
+  Pressable,
+  Modal,
 } from "native-base";
 import Navbar from "../../components/Navbar";
 import { useNavigation } from "@react-navigation/native";
@@ -17,8 +19,8 @@ import FeatherIcon from "react-native-vector-icons/Feather";
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { API_URL } from "@env";
-
+import { EXPO_PUBLIC_API_URL } from "@env";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default function Upload() {
   const toast = useToast();
@@ -32,6 +34,8 @@ export default function Upload() {
   const [videoTitle, setVideoTitle] = useState("");
   const [youtubeLink, setYoutubeLink] = useState("");
   const [photo, setPhoto] = useState(null);
+  const [allInputsFilled, setAllInputsFilled] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSubmit = async () => {
     try {
@@ -51,7 +55,7 @@ export default function Upload() {
       }
 
       const response = await axios.post(
-        `${API_URL}/recipes`,
+        `${EXPO_PUBLIC_API_URL}/recipes`,
         formData,
         {
           headers: {
@@ -71,14 +75,16 @@ export default function Upload() {
         isClosable: true,
       });
     } catch (error) {
-      error.response?.data?.message || "Unknown error occurred";
-      alert("Create error:", errorMessage);
+      const errorMessage =
+        error.response?.data?.message || "Unknown error occurred";
+      alert("Create error: " + errorMessage);
       console.error("Error:", error);
     }
   };
 
   const handlePickPhoto = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.granted === false) {
       alert("Izinkan Camera!");
       return;
@@ -93,32 +99,74 @@ export default function Upload() {
     if (!pickerResult.cancelled) {
       setPhoto(pickerResult.uri);
     }
+    setIsModalOpen(false); 
   };
+
+  const takePhotoWithCamera = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert("Izinkan Akses Kamera!");
+      return;
+    }
+
+    const pickerResult = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!pickerResult.cancelled) {
+      setPhoto(pickerResult.uri);
+    }
+    setIsModalOpen(false); 
+  };
+
+  const cancelPhoto = () => {
+    setIsModalOpen(false); 
+  };
+
+  const checkAllInputsFilled = () => {
+    if (
+      title.trim() !== "" &&
+      ingredients.trim() !== "" &&
+      videoTitle.trim() !== "" &&
+      youtubeLink.trim() !== "" &&
+      photo !== null
+    ) {
+      setAllInputsFilled(true);
+    } else {
+      setAllInputsFilled(false);
+    }
+  };
+
+  useEffect(() => {
+    checkAllInputsFilled();
+  }, [title, ingredients, videoTitle, youtubeLink, photo]);
 
   return (
     <NativeBaseProvider>
       <View style={styles.container}>
-        <FeatherIcon
-          style={{
-            color: "#999999",
-            fontSize: 34,
-            textAlign: "left",
-            marginTop: 20,
-          }}
-          name="arrow-left"
-          onPress={goToHome}
-        />
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
         >
           <View style={styles.main}>
-            <Text style={styles.welcome}>Add Your Recipe</Text>
-            <Stack space={4} w="100%" alignItems="center" mt={10}>
+            <View style={{ flexDirection: "row", height: 48 }}>
+              {/* <FeatherIcon
+              style={{
+                color: "#999999",
+                fontSize: 34,
+              }}
+              name="arrow-left"
+              onPress={goToHome}
+            /> */}
+              <Text style={styles.welcome}>Add Your Recipe</Text>
+            </View>
+            <Stack space={4} w="100%" alignItems="center">
               <Input
                 w="319"
                 h="60"
+                mt="5"
                 borderRadius={10}
                 borderBottomWidth={1}
                 borderColor="#C4C4C4"
@@ -151,7 +199,12 @@ export default function Upload() {
               {photo && (
                 <Image
                   source={{ uri: photo }}
-                  style={{ width: 300, height: 150, borderRadius: 15 }}
+                  style={{
+                    width: 300,
+                    height: 221,
+                    borderRadius: 15,
+                    objectFit: "cover",
+                  }}
                 />
               )}
               <Button
@@ -161,7 +214,7 @@ export default function Upload() {
                 borderBottomWidth={1}
                 borderColor="#C4C4C4"
                 backgroundColor="white"
-                onPress={handlePickPhoto}
+                onPress={() => setIsModalOpen(true)}
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <Icon
@@ -217,15 +270,30 @@ export default function Upload() {
               />
             </Stack>
             <VStack space={4} alignItems="center">
-              <Button
-                w={183}
-                mt="50"
-                backgroundColor="#EFC81A"
+              <Pressable
+                w={319}
+                mt="5"
+                backgroundColor={allInputsFilled ? "#EFC81A" : "#C4C4C4"}
                 borderRadius={10}
+                _pressed={{
+                  backgroundColor: allInputsFilled ? "#FFD700" : "#C4C4C4",
+                }}
+                style={{
+                  height: 50,
+                  justifyContent: "center",
+                }}
+                isDisabled={!allInputsFilled}
                 onPress={handleSubmit}
               >
-                POST
-              </Button>
+                <Text
+                  style={{
+                    color: "#fff",
+                    textAlign: "center",
+                  }}
+                >
+                  POST
+                </Text>
+              </Pressable>
             </VStack>
           </View>
         </ScrollView>
@@ -233,6 +301,22 @@ export default function Upload() {
       <View>
         <Navbar />
       </View>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <Modal.Content maxWidth="400px">
+          <Modal.Header>Add Image</Modal.Header>
+          <Modal.Body>
+            <Button w="100%" mb={2} onPress={handlePickPhoto}>
+              Choose from Library
+            </Button>
+            <Button w="100%" mb={2} onPress={takePhotoWithCamera}>
+              Take Photo
+            </Button>
+            <Button w="100%" onPress={cancelPhoto}>
+              Cancel
+            </Button>
+          </Modal.Body>
+        </Modal.Content>
+      </Modal>
     </NativeBaseProvider>
   );
 }
@@ -240,19 +324,21 @@ export default function Upload() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
-    paddingBottom: 100,
+    paddingLeft: 24,
+    paddingRight: 24,
     backgroundColor: "#EFEFEF",
   },
   main: {
-    // justifyContent: "center",
     alignItems: "center",
     textAlign: "center",
+    marginTop: 24,
+    marginBottom: 100,
   },
   welcome: {
     color: "#EFC81A",
     fontSize: 24,
-    marginTop: 5,
+    flex: 1,
+    textAlign: "center",
   },
   scrollContent: {
     flexGrow: 1,

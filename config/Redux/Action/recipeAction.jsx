@@ -1,11 +1,11 @@
 import axios from "axios";
-import { API_URL } from "@env";
+import { EXPO_PUBLIC_API_URL } from "@env";
 
 
 export const updateRecipes = (recipeId, formData) => async (dispatch) => {
   try {
     const response = await axios.put(
-      `${API_URL}/recipes/${recipeId}`,
+      `${EXPO_PUBLIC_API_URL}/recipes/${recipeId}`,
       formData,
       {
         headers: {
@@ -21,7 +21,7 @@ export const updateRecipes = (recipeId, formData) => async (dispatch) => {
 
 export const getRecipes = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_URL}/recipes`);
+    const response = await axios.get(`${EXPO_PUBLIC_API_URL}/recipes`);
     const result = response.data.data;
     dispatch({ type: "GET_ALL_RECIPE", payload: result });
   } catch (error) {
@@ -31,7 +31,7 @@ export const getRecipes = () => async (dispatch) => {
 
 export const getRecipesByid = (recipeId) => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_URL}/recipes/${recipeId}`);
+    const response = await axios.get(`${EXPO_PUBLIC_API_URL}/recipes/${recipeId}`);
     const result = response.data.data[0];
     dispatch({ type: "GET_DETAIL_RECIPE", payload: result });
   } catch (error) {
@@ -41,9 +41,9 @@ export const getRecipesByid = (recipeId) => async (dispatch) => {
 
 export const getRecipesByUsersid = (userId) => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_URL}/recipes/users/${userId}`);
-    const result = response.data.data[0];
-    dispatch({ type: "GET_DETAIL_RECIPE", payload: result });
+    const response = await axios.get(`${EXPO_PUBLIC_API_URL}/recipes/users/${userId}`);
+    const result = response.data.data;
+    dispatch({ type: "GET_ALL_RECIPE", payload: result });
   } catch (error) {
     console.error(error);
   }
@@ -52,7 +52,7 @@ export const getRecipesByUsersid = (userId) => async (dispatch) => {
 export const deleteRecipes = (recipeId) => async (dispatch) => {
   try {
     const response = await axios.delete(
-      `${API_URL}/recipes/${recipeId}`
+      `${EXPO_PUBLIC_API_URL}/recipes/${recipeId}`
     );
     const result = response.data.data;
     dispatch({ type: "DELETE_RECIPE", payload: result });

@@ -1,13 +1,11 @@
 import { StyleSheet, Text, View, Image, ActivityIndicator } from "react-native";
-import { Button, Input, Icon, VStack } from "native-base";
+import { Button, Input, Icon, VStack, Pressable, Modal } from "native-base";
 import React, { useEffect, useState } from "react";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { API_URL } from "@env";
-
+import { EXPO_PUBLIC_API_URL } from "@env";
 
 export default function EditProfile() {
   const route = useRoute();
@@ -15,6 +13,7 @@ export default function EditProfile() {
   const [name, setName] = useState("");
   const [photo, setPhoto] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigation = useNavigation();
 
   const goBack = () => {
@@ -24,7 +23,9 @@ export default function EditProfile() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get(`${API_URL}/users/${userId}`);
+        const response = await axios.get(
+          `${EXPO_PUBLIC_API_URL}/users/${userId}`
+        );
         const userData = response.data.data[0];
         setName(userData.name);
         setPhoto(userData.photo);
@@ -50,12 +51,15 @@ export default function EditProfile() {
         });
       }
 
-      const response = await axios.put(`${API_URL}/users/${userId}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      console.log("API Response:", response.data);
+      const response = await axios.put(
+        `${EXPO_PUBLIC_API_URL}/users/${userId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       navigation.navigate("profile", { userId });
     } catch (error) {
       console.error("Error:", error);
@@ -63,7 +67,8 @@ export default function EditProfile() {
   };
 
   const handlePickPhoto = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.granted === false) {
       alert("Izinkan Camera!");
       return;
@@ -78,16 +83,47 @@ export default function EditProfile() {
     if (!pickerResult.cancelled) {
       setPhoto(pickerResult.uri);
     }
+    setIsModalOpen(false);
+  };
+
+  const takePhotoWithCamera = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert("Izinkan Akses Kamera!");
+      return;
+    }
+
+    const pickerResult = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!pickerResult.cancelled) {
+      setPhoto(pickerResult.uri);
+    }
+    setIsModalOpen(false);
+  };
+
+  const cancelPhoto = () => {
+    setIsModalOpen(false);
   };
 
   return (
     <View style={styles.container}>
-      <View style={{ flexDirection: "row", height: 48}}>
+      <View
+        style={{
+          flexDirection: "row",
+          height: 48,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <FeatherIcon
           style={{
             color: "#999999",
             fontSize: 34,
-            marginRight: 110,
+            position: "absolute",
+            left: 16,
           }}
           name="arrow-left"
           onPress={goBack}
@@ -96,7 +132,6 @@ export default function EditProfile() {
           style={{
             color: "#EEC302",
             fontSize: 18,
-            alignItems: "center",
             fontWeight: "bold",
           }}
         >
@@ -105,7 +140,11 @@ export default function EditProfile() {
       </View>
       <View style={{ alignItems: "center" }}>
         {isLoading ? (
-          <ActivityIndicator size="large" color="#6D61F2" style={{ marginTop: 30 }} />
+          <ActivityIndicator
+            size="large"
+            color="#6D61F2"
+            style={{ marginTop: 30 }}
+          />
         ) : (
           <React.Fragment>
             {photo ? (
@@ -164,31 +203,54 @@ export default function EditProfile() {
               borderBottomWidth={1}
               borderColor="#C4C4C4"
               backgroundColor="white"
-              onPress={handlePickPhoto}
+              onPress={() => setIsModalOpen(true)}
+              // onPress={handlePickPhoto}
             >
-              <Icon as={<FeatherIcon name="image" />} size={7} color="#C4C4C4" />
+              <Icon
+                as={<FeatherIcon name="image" />}
+                size={7}
+                color="#C4C4C4"
+              />
             </Button>
 
             <VStack space={4} alignItems="center">
-              <Button
+              <Pressable
                 w={183}
                 mt="30"
                 backgroundColor="#EFC81A"
                 borderRadius={10}
                 onPress={handleSubmit}
+                style={{ height: 40, justifyContent: "center" }}
+                _pressed={{ backgroundColor: "#FFD700" }}
               >
-                Edit
-              </Button>
+                <Text style={{ color: "#fff", textAlign: "center" }}>Edit</Text>
+              </Pressable>
             </VStack>
           </React.Fragment>
         )}
       </View>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <Modal.Content maxWidth="400px">
+          <Modal.Header>Add Image</Modal.Header>
+          <Modal.Body>
+            <Button w="100%" mb={2} onPress={handlePickPhoto}>
+              Choose from Library
+            </Button>
+            <Button w="100%" mb={2} onPress={takePhotoWithCamera}>
+              Take Photo
+            </Button>
+            <Button w="100%" onPress={cancelPhoto}>
+              Cancel
+            </Button>
+          </Modal.Body>
+        </Modal.Content>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    padding: 10,
   },
 });

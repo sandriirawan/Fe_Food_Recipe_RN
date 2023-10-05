@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_URL } from "@env";
+import { EXPO_PUBLIC_API_URL } from "@env";
 
 
 export const login = (data) => async (dispatch) => {

@@ -1,5 +1,11 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import { NativeBaseProvider, TextArea, VStack, Button } from "native-base";
+import {
+  NativeBaseProvider,
+  TextArea,
+  VStack,
+  Button,
+  Pressable,
+} from "native-base";
 import React, { useEffect, useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
@@ -12,8 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { createLikeds } from "../../config/Redux/Action/LikedsAction";
 import { createBookmarks } from "../../config/Redux/Action/bookmarksAction";
 import { getRecipesByid } from "../../config/Redux/Action/recipeAction";
-import { API_URL } from "@env";
-
+import { EXPO_PUBLIC_API_URL } from "@env";
 
 export default function Detail() {
   const dispatch = useDispatch();
@@ -29,7 +34,7 @@ export default function Detail() {
   const [commentData, setCommentData] = useState("");
   const [comment, setComment] = useState("");
   const [commentMenuVisibility, setCommentMenuVisibility] = useState({});
-  
+  const [allInputsFilled, setAllInputsFilled] = useState(false);
 
   const toggleCommentMenu = (commentId) => {
     setCommentMenuVisibility((prevVisibility) => ({
@@ -68,7 +73,7 @@ export default function Detail() {
 
   useEffect(() => {
     axios
-      .get(`${API_URL}/recipes/${recipeId}`)
+      .get(`${EXPO_PUBLIC_API_URL}/recipes/${recipeId}`)
       .then((response) => {
         setData(response.data.data);
       })
@@ -79,7 +84,7 @@ export default function Detail() {
 
   const handleComments = async () => {
     try {
-      const response = await axios.post(`${API_URL}/comments`, {
+      const response = await axios.post(`${EXPO_PUBLIC_API_URL}/comments`, {
         recipes_id: recipeId,
         users_id: userId,
         comment,
@@ -98,7 +103,7 @@ export default function Detail() {
 
   const getData = async () => {
     axios
-      .get(`${API_URL}/comments/${recipeId}`)
+      .get(`${EXPO_PUBLIC_API_URL}/comments/${recipeId}`)
       .then((response) => {
         setCommentData(response.data.data);
       })
@@ -109,7 +114,7 @@ export default function Detail() {
 
   const handleDelete = (id) => {
     axios
-      .delete(`${API_URL}/comments/${id}`)
+      .delete(`${EXPO_PUBLIC_API_URL}/comments/${id}`)
       .then((response) => {
         console.log("comments deleted successfully");
         getData();
@@ -141,6 +146,18 @@ export default function Detail() {
     navigation.navigate("video", { recipeId });
   };
 
+  const checkAllInputsFilled = () => {
+    if (comment.trim() !== "") {
+      setAllInputsFilled(true);
+    } else {
+      setAllInputsFilled(false);
+    }
+  };
+
+  useEffect(() => {
+    checkAllInputsFilled();
+  }, [comment]);
+
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
@@ -152,8 +169,9 @@ export default function Detail() {
             <View style={styles.firstWrap}>
               <View>
                 <Image
-                  style={{ width: "100%", height: 462 }}
+                  style={{ width: "100%", height: 442 }}
                   source={{ uri: recipe.photo }}
+                  resizeMode="cover"
                 />
               </View>
               <FeatherIcon
@@ -236,7 +254,7 @@ export default function Detail() {
               )}
               {activeTab === "StepVideo" && (
                 <View style={styles.tabContent2}>
-                  <View style={styles.StepVideo}>
+                  <TouchableOpacity style={styles.StepVideo}>
                     <View style={styles.icon}>
                       <FeatherIcon
                         style={{
@@ -258,7 +276,7 @@ export default function Detail() {
                     >
                       Step 1
                     </Text>
-                  </View>
+                  </TouchableOpacity>
                   <View style={styles.StepVideo}>
                     <View style={styles.icon}>
                       <FeatherIcon
@@ -296,15 +314,29 @@ export default function Detail() {
                       onChangeText={setComment}
                     />
                     <VStack>
-                      <Button
+                      <Pressable
                         w={319}
                         mt="5"
-                        backgroundColor="#EFC81A"
+                        backgroundColor={
+                          allInputsFilled ? "#EFC81A" : "#C4C4C4"
+                        }
                         borderRadius={10}
                         onPress={handleComments}
+                        _pressed={{
+                          backgroundColor: allInputsFilled
+                            ? "#FFD700"
+                            : "#C4C4C4",
+                        }}
+                        style={{
+                          height: 40,
+                          justifyContent: "center",
+                        }}
+                        isDisabled={!allInputsFilled}
                       >
-                        POST
-                      </Button>
+                        <Text style={{ color: "#fff", textAlign: "center" }}>
+                          POST
+                        </Text>
+                      </Pressable>
                     </VStack>
                   </NativeBaseProvider>
                   <Text style={{ marginTop: 20 }}>Comment :</Text>
@@ -318,8 +350,13 @@ export default function Detail() {
                         }}
                       >
                         <Image
-                          style={{ width: 42, height: 42, marginRight: 20 }}
-                          source={require("../../assets/Ellipse.png")}
+                          style={{
+                            width: 42,
+                            height: 42,
+                            marginRight: 20,
+                            borderRadius: 27,
+                          }}
+                          source={{ uri: item.photo }}
                         />
                         <View style={{ width: 250, height: "auto" }}>
                           <Text style={{ fontWeight: "bold" }}>
@@ -373,7 +410,7 @@ const styles = StyleSheet.create({
     color: "#F5F5F5",
     fontSize: 34,
     position: "absolute",
-    top: 50,
+    top: 20,
     left: 20,
   },
   title: {
@@ -483,12 +520,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   tabContent: {
-    paddingLeft: 50,
+    paddingLeft: 40,
     paddingTop: 20,
     height: 420,
   },
   tabContent2: {
-    paddingLeft: 50,
+    paddingLeft: 40,
     paddingTop: 20,
     height: "auto",
     paddingBottom: 50,

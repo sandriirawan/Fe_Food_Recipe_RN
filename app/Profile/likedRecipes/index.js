@@ -1,35 +1,38 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Image, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import { TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import getBookmarks, { deleteBookmarks } from "../../../config/Redux/Action/bookmarksAction";
+import getLikeds, {
+  deleteLikeds,
+} from "../../../config/Redux/Action/LikedsAction";
+import { Skeleton } from "native-base";
 
-export default function SavedRecipes() {
+export default function LikedRecipes() {
   const dispatch = useDispatch();
   const route = useRoute();
   const { userId } = route.params;
 
   useEffect(() => {
-    dispatch(getBookmarks(userId));
+    dispatch(getLikeds(userId));
   }, [dispatch, userId]);
 
-  const getBookmark = useSelector((state) => state.bookmark);
+  const getLiked = useSelector((state) => state.liked);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (getBookmark.loading) {
+    if (getLiked.loading) {
       setIsLoading(true);
     } else {
       setIsLoading(false);
     }
-  }, [getBookmark.loading]);
+  }, [getLiked.loading]);
 
-  const handleDelete = (bookmark_id) => {
+  const handleDelete = async (liked_id) => {
     try {
-      dispatch(deleteBookmarks(bookmark_id));
-      dispatch(getBookmarks(userId));
+      dispatch(deleteLikeds(liked_id));
+      dispatch(getLikeds(userId));
     } catch (error) {
       console.error("Error deleting liked:", error);
     }
@@ -46,16 +49,24 @@ export default function SavedRecipes() {
 
   return (
     <View style={styles.container}>
-      <View style={{ flexDirection: "row", height: 48}}>
+      <View
+        style={{
+          flexDirection: "row",
+          height: 48,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <FeatherIcon
           style={{
             color: "#999999",
             fontSize: 34,
-            marginRight: 110,
+            position: "absolute",
+            left: 16,
           }}
           name="arrow-left"
           onPress={goBack}
-        />  
+        />
         <Text
           style={{
             color: "#EEC302",
@@ -63,35 +74,37 @@ export default function SavedRecipes() {
             fontWeight: "bold",
           }}
         >
-          Saved Recipe
+          Liked Recipe
         </Text>
       </View>
 
       {isLoading ? (
-        <ActivityIndicator size="large" color="#6D61F2" style={{ marginTop: 20 }} />
+        <View style={styles.recipeWrapper}>
+          <Skeleton style={{ width: 80, height: 80, borderRadius: 16 }} />
+          <View style={{ marginTop: 5, marginLeft: 10 }}>
+            <Skeleton.Text h={16} w={120} />
+          </View>
+        </View>
       ) : (
-        getBookmark.bookmark.map((item) => (
-          <View style={styles.recipeWrapper} key={item.id}>
+        getLiked.liked.map((liked) => (
+          <View style={styles.recipeWrapper} key={liked.id}>
             <TouchableOpacity
               style={styles.recipeTouchable}
-              onPress={() => goToDetail(item.id)}
+              onPress={() => goToDetail(liked.id)}
             >
               <Image
                 style={{ width: 80, height: 80, borderRadius: 16 }}
-                source={{ uri: item.photo }}
+                source={{ uri: liked.photo }}
               />
               <View style={{ marginTop: 5, marginLeft: 10 }}>
                 <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                  {item.title}
+                  {liked.title}
                 </Text>
               </View>
             </TouchableOpacity>
             <View style={styles.iconsContainer}>
-              <TouchableOpacity onPress={() => handleDelete(item.bookmark_id)}>
-                <FeatherIcon
-                  style={styles.bookmarkIcon}
-                  name="bookmark"
-                />
+              <TouchableOpacity onPress={() => handleDelete(liked.liked_id)}>
+                <FeatherIcon style={styles.bookmarkIcon} name="thumbs-up" />
               </TouchableOpacity>
             </View>
           </View>
@@ -104,7 +117,7 @@ export default function SavedRecipes() {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    paddingTop: 25,
+    paddingTop: 10,
   },
   recipeWrapper: {
     flexDirection: "row",

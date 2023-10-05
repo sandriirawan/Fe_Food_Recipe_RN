@@ -20,7 +20,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TouchableOpacity } from "react-native";
 import { StackActions } from "@react-navigation/native";
-import { API_URL } from "@env";
+import { EXPO_PUBLIC_API_URL } from "@env";
 
 export default function Login() {
   const [show, setShow] = React.useState(false);
@@ -28,6 +28,7 @@ export default function Login() {
   const [confirmpassword, setConfirmpassword] = useState("");
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [allInputsFilled, setAllInputsFilled] = useState(false);
   const toast = useToast();
   const navigation = useNavigation();
   const register = () => {
@@ -40,22 +41,30 @@ export default function Login() {
       confirmpassword: confirmpassword,
     };
     try {
-      const response = await axios.post(`${API_URL}/users/login`, data);
-      const userId = response.data.data.id;
-      const userToken = response.data.data.token;
-      await AsyncStorage.setItem("userId", userId);
-      await AsyncStorage.setItem("userToken", userToken);
+      const response = await axios.post(
+        `${EXPO_PUBLIC_API_URL}/users/login`,
+        data
+      );
+      if (response) {
+        const userId = response.data.data.id;
+        const userToken = response.data.data.token;
+        await AsyncStorage.setItem("userId", userId);
+        await AsyncStorage.setItem("userToken", userToken);
 
-      navigation.dispatch(StackActions.replace("home"));
-      setEmail("");
-      setConfirmpassword("");
+        // navigation.dispatch(StackActions.replace("home"));
+        navigation.reset({
+          routes: [{ name: "home" }],
+        });
+        setEmail("");
+        setConfirmpassword("");
 
-      toast.show({
-        title: "Login Successful",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
+        toast.show({
+          title: "Login Successful",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Unknown error occurred";
@@ -82,6 +91,19 @@ export default function Login() {
   const hideErrorAlert = () => {
     setShowErrorAlert(false);
   };
+
+  const checkAllInputsFilled = () => {
+    if (email.trim() !== "" && confirmpassword.trim() !== "") {
+      setAllInputsFilled(true);
+    } else {
+      setAllInputsFilled(false);
+    }
+  };
+
+  useEffect(() => {
+    checkAllInputsFilled();
+  }, [email, confirmpassword]);
+
   return (
     <NativeBaseProvider>
       <View style={styles.container}>
@@ -155,15 +177,30 @@ export default function Login() {
             <Text style={styles.forgotPassword}>Forgot Password ?</Text>
           </View>
           <VStack space={4} alignItems="center">
-            <Button
+            <Pressable
               w={319}
-              mt="30"
-              backgroundColor="#EFC81A"
+              mt="5"
+              backgroundColor={allInputsFilled ? "#EFC81A" : "#C4C4C4"}
               borderRadius={10}
+              _pressed={{
+                backgroundColor: allInputsFilled ? "#FFD700" : "#C4C4C4",
+              }}
+              style={{
+                height: 50,
+                justifyContent: "center",
+              }}
+              isDisabled={!allInputsFilled}
               onPress={handleLogin}
             >
-              LOG IN
-            </Button>
+              <Text
+                style={{
+                  color: "#fff",
+                  textAlign: "center",
+                }}
+              >
+                LOG IN
+              </Text>
+            </Pressable>
           </VStack>
           <Text style={styles.signUp}>
             Don’t have an account?{" "}

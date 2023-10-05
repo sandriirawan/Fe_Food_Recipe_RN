@@ -85,7 +85,8 @@ const EditRecipes = ({ updateRecipes }) => {
   };
 
   const handlePickPhoto = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.granted === false) {
       alert("Izinkan Camera!");
       return;
@@ -119,24 +120,25 @@ const EditRecipes = ({ updateRecipes }) => {
   return (
     <NativeBaseProvider>
       <View style={styles.container}>
-        <View style={{flexDirection:"row"}}>
-        <FeatherIcon
-          style={{
-            color: "#999999",
-            fontSize: 34,
-            textAlign: "left",
-            marginRight:90
-          }}
-          name="arrow-left"
-          onPress={goBack}
-        />
-          <Text style={styles.welcome}>Edit Recipe</Text>
-        </View>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
         >
+          <View style={{ flexDirection: "row", paddingTop: 20 }}>
+            <FeatherIcon
+              style={{
+                color: "#999999",
+                fontSize: 34,
+                textAlign: "left",
+                marginRight: 90,
+              }}
+              name="arrow-left"
+              onPress={goBack}
+            />
+            <Text style={styles.welcome}>Edit Recipe</Text>
+          </View>
+
           <View style={styles.main}>
             {isLoading ? (
               <ActivityIndicator
@@ -256,6 +258,7 @@ const EditRecipes = ({ updateRecipes }) => {
                   backgroundColor="#EFC81A"
                   borderRadius={10}
                   onPress={handleSubmit}
+                  style={{ marginBottom: 50 }}
                 >
                   UPDATE
                 </Button>
@@ -273,8 +276,10 @@ export default connect(null, { updateRecipes })(EditRecipes);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    paddingBottom: 100,
+    // padding: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingBottom: 0,
     backgroundColor: "#EFEFEF",
   },
   main: {
@@ -285,8 +290,8 @@ const styles = StyleSheet.create({
   welcome: {
     color: "#EFC81A",
     fontSize: 24,
-  
-    fontWeight:"bold"
+
+    fontWeight: "bold",
   },
   scrollContent: {
     flexGrow: 1,

@@ -13,12 +13,12 @@ import {
   useToast,
 } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AwesomeAlert from "react-native-awesome-alerts";
 import { useNavigation } from "@react-navigation/native";
 import { TouchableOpacity } from "react-native";
-import { API_URL } from "@env";
+import { EXPO_PUBLIC_API_URL } from "@env";
 import { ScrollView } from "react-native-gesture-handler";
 
 export default function Register() {
@@ -30,16 +30,20 @@ export default function Register() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmpassword, setConfirmpassword] = useState("");
+  const [allInputsFilled, setAllInputsFilled] = useState(false);
 
   const handleRegister = async () => {
     try {
-      const response = await axios.post(`${API_URL}/users/register`, {
-        name,
-        email,
-        phone,
-        password,
-        confirmpassword,
-      });
+      const response = await axios.post(
+        `${EXPO_PUBLIC_API_URL}/users/register`,
+        {
+          name,
+          email,
+          phone,
+          password,
+          confirmpassword,
+        }
+      );
       setName("");
       setEmail("");
       setPhone("");
@@ -67,21 +71,27 @@ export default function Register() {
     navigation.navigate("login");
   };
 
-  const goBack = () => {
-    navigation.goBack();
+  const checkAllInputsFilled = () => {
+    if (
+      name.trim() !== "" &&
+      email.trim() !== "" &&
+      phone.trim() !== "" &&
+      password.trim() !== "" &&
+      confirmpassword.trim() !== ""
+    ) {
+      setAllInputsFilled(true);
+    } else {
+      setAllInputsFilled(false);
+    }
   };
+
+  useEffect(() => {
+    checkAllInputsFilled();
+  }, [name, email, phone, password, confirmpassword]);
+
   return (
     <NativeBaseProvider>
       <View style={styles.container}>
-        <FeatherIcon
-          style={{
-            color: "#999999",
-            fontSize: 34,
-            textAlign: "left",
-          }}
-          name="arrow-left"
-          onPress={goBack}
-        />
         <ScrollView
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
@@ -241,15 +251,30 @@ export default function Register() {
             </Stack>
             <Text style={styles.forgotPassword}>Forgot Password ?</Text>
             <VStack space={4} alignItems="center">
-              <Button
+              <Pressable
                 w={319}
-                mt="30"
-                backgroundColor="#EFC81A"
+                mt="5"
+                backgroundColor={allInputsFilled ? "#EFC81A" : "#C4C4C4"}
                 borderRadius={10}
                 onPress={handleRegister}
+                _pressed={{
+                  backgroundColor: allInputsFilled ? "#FFD700" : "#C4C4C4",
+                }}
+                style={{
+                  height: 50,
+                  justifyContent: "center",
+                }}
+                isDisabled={!allInputsFilled}
               >
-                SIGN UP
-              </Button>
+                <Text
+                  style={{
+                    color: "#fff",
+                    textAlign: "center",
+                  }}
+                >
+                  SIGN UP
+                </Text>
+              </Pressable>
             </VStack>
             <Text style={styles.signUp}>
               Don’t have an account?{" "}

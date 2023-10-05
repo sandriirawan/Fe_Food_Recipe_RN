@@ -4,7 +4,7 @@
     "slug": "food-recipe",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/FoodRecipe.png",
     "splash": {
       "image": "./assets/FoodRecipe.png",
       "resizeMode": "contain",
@@ -22,23 +22,20 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "foregroundImage": "./assets/FoodRecipe.png",
+        "backgroundColor": "#EFC81A"
       },
-      "package": "com.sandriirawan.reactnativenativebase"
+      "package": "com.sandriirawan.reactnativenativebase",
+      "permissions": ["CAMERA", "CAMERA_ROLL"] 
     },
     "scheme": "acme",
     "web": {
       "bundler": "metro"
     },
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "extra": {
       "eas": {
-        "projectId": "868c002b-38ea-4620-946e-2c0c13473f72"
+        "projectId": "6dc2428b-3e2b-4e37-ae51-1e9b0fcd523d"
       }
     }
   }

@@ -39,7 +39,7 @@ const Navbar = () => {
             onPress={goToSearch}
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.icon} >
+        <TouchableOpacity style={styles.icon}>
           <FeatherIcon
             name="plus-square"
             color="#6E80B0"
@@ -89,29 +89,3 @@ const styles = StyleSheet.create({
 });
 
 export default Navbar;
-
-{
-  /* <Input
-                w="319"
-                h="60"
-                borderRadius={10}
-                borderBottomWidth={1}
-                borderColor="#C4C4C4"
-                backgroundColor="white"
-                InputLeftElement={
-                  <Icon
-                    as={<FeatherIcon name="video" />}
-                    size={7}
-                    ml="2"
-                    color="#C4C4C4"
-                  />
-                }
-                placeholder="Add Video"
-                placeholderTextColor="#C4C4C4"
-              /> */
-}
-
-{
-  /* <FeatherIcon style={styles.afterBookmark} name="bookmark" />
-        <FeatherIcon style={styles.afterLike} name="thumbs-up" /> */
-}

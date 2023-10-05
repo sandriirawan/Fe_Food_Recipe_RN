@@ -8,7 +8,6 @@ import {
   TouchableWithoutFeedback,
   BackHandler,
   Alert,
-  ActivityIndicator,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Navbar from "../../components/Navbar";
@@ -21,12 +20,13 @@ import { useDispatch, useSelector } from "react-redux";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import Pagination from "react-native-pagination";
 import { TouchableOpacity } from "react-native";
+import { Skeleton } from "native-base";
 
 const Home = () => {
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const recipesPerPage = 3;
+  const recipesPerPage = 5;
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
@@ -116,43 +116,60 @@ const Home = () => {
           <View style={styles.imageContainer}>
             <Text style={{ fontSize: 18, marginTop: 20 }}>New Recipes</Text>
             <View style={styles.imageWrapper}>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {getRecipe
-                  .slice()
-                  .reverse()
-                  .map((recipe) => (
-                    <TouchableWithoutFeedback
-                      key={recipe.id}
-                      onPress={() => goToDetail(recipe.id)}
-                    >
-                      <View style={{ marginRight: 20 }}>
-                        <Image
-                          style={{
-                            width: 130,
-                            height: 160,
-                            position: "relative",
-                            borderRadius: 15,
-                          }}
-                          source={{ uri: recipe.photo }}
-                        />
-                        <Text
-                          style={{
-                            position: "absolute",
-                            top: 100,
-                            color: "white",
-                            fontSize: 14,
-                            fontWeight: "500",
-                            width: 61,
-                            left: 10,
-                            overflow: "hidden",
-                          }}
-                        >
-                          {recipe.title}
-                        </Text>
-                      </View>
-                    </TouchableWithoutFeedback>
-                  ))}
-              </ScrollView>
+              {getRecipe.length === 0 ? (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={{ marginRight: 20 }}>
+                    <Skeleton h={160} w={130} />
+                  </View>
+                  <View style={{ marginRight: 20 }}>
+                    <Skeleton h={160} w={130} />
+                  </View>
+                  <View style={{ marginRight: 20 }}>
+                    <Skeleton h={160} w={130} />
+                  </View>
+                  <View style={{ marginRight: 20 }}>
+                    <Skeleton h={160} w={130} />
+                  </View>
+                </ScrollView>
+              ) : (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {getRecipe
+                    .slice()
+                    .reverse()
+                    .map((recipe) => (
+                      <TouchableWithoutFeedback
+                        key={recipe.id}
+                        onPress={() => goToDetail(recipe.id)}
+                      >
+                        <View style={{ marginRight: 20 }}>
+                          <Image
+                            style={{
+                              width: 130,
+                              height: 160,
+                              position: "relative",
+                              borderRadius: 15,
+                            }}
+                            source={{ uri: recipe.photo }}
+                          />
+                          <Text
+                            style={{
+                              position: "absolute",
+                              top: 100,
+                              color: "white",
+                              fontSize: 14,
+                              fontWeight: "500",
+                              width: 61,
+                              left: 10,
+                              overflow: "hidden",
+                            }}
+                          >
+                            {recipe.title}
+                          </Text>
+                        </View>
+                      </TouchableWithoutFeedback>
+                    ))}
+                </ScrollView>
+              )}
             </View>
             <View
               style={{
@@ -175,11 +192,32 @@ const Home = () => {
             </View>
 
             {getRecipe.length === 0 ? (
-              <ActivityIndicator
-                size="large"
-                color="#6D61F2"
-                style={{ marginTop: 20 }}
-              />
+              <>
+                <View style={styles.recipeWrapper}>
+                  <Skeleton
+                    style={{ width: 64, height: 64, borderRadius: 16 }}
+                  />
+                  <View style={{ marginTop: 5, marginLeft: 10 }}>
+                    <Skeleton.Text h={16} w={120} />
+                  </View>
+                </View>
+                <View style={styles.recipeWrapper}>
+                  <Skeleton
+                    style={{ width: 64, height: 64, borderRadius: 16 }}
+                  />
+                  <View style={{ marginTop: 5, marginLeft: 10 }}>
+                    <Skeleton.Text h={16} w={120} />
+                  </View>
+                </View>
+                <View style={styles.recipeWrapper}>
+                  <Skeleton
+                    style={{ width: 64, height: 64, borderRadius: 16 }}
+                  />
+                  <View style={{ marginTop: 5, marginLeft: 10 }}>
+                    <Skeleton.Text h={16} w={120} />
+                  </View>
+                </View>
+              </>
             ) : (
               getRecipe
                 .slice(
@@ -236,7 +274,7 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingLeft: 28,
+    paddingLeft: 20,
     // paddingRight: 28,
     paddingTop: 20,
     backgroundColor: "white",

@@ -3,13 +3,10 @@ import React, { useEffect, useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import FeatherIcon from "react-native-vector-icons/Feather";
-import YouTube from "react-native-youtube-iframe"; 
+import YouTube from "react-native-youtube-iframe";
 import axios from "axios";
-import { parseISO, formatDistanceToNow } from 'date-fns'; 
-import { API_URL } from "@env";
-
-
-
+import { parseISO, formatDistanceToNow } from "date-fns";
+import { EXPO_PUBLIC_API_URL } from "@env";
 
 export default function VideoScreen() {
   const route = useRoute();
@@ -20,16 +17,18 @@ export default function VideoScreen() {
   };
   const [videoUrl, setVideoUrl] = useState("");
   const [data, setData] = useState([]);
+  console.log(videoUrl);
 
   useEffect(() => {
     axios
-      .get(`${API_URL}/recipes/${recipeId}`)
+      .get(`${EXPO_PUBLIC_API_URL}/recipes/${recipeId}`)
       .then((response) => {
         const videoLink = response.data.data[0].video;
         const videoId = videoLink.split("/").pop();
-        setVideoUrl(videoId);
+        const cleanVideoId = videoId.split("?")[0];
+        setVideoUrl(cleanVideoId);
+
         setData(response.data.data);
-        console.log(videoId);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -37,32 +36,29 @@ export default function VideoScreen() {
   }, []);
 
   return (
-    <View style={{paddingTop:25}}>
+    <View style={{ paddingTop: 25 }}>
       <View
         style={{
           flexDirection: "row",
           height: 48,
-          marginTop: 40,
-          marginLeft: 28,
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
-        <TouchableOpacity>
-
         <FeatherIcon
           style={{
             color: "#999999",
             fontSize: 34,
-            marginRight:90,
+            position: "absolute",
+            left: 16,
           }}
           name="arrow-left"
           onPress={goBack}
         />
-        </TouchableOpacity>
         <Text
           style={{
             color: "#EEC302",
             fontSize: 18,
-            alignItems: "center",
             fontWeight: "bold",
           }}
         >
@@ -83,7 +79,6 @@ export default function VideoScreen() {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   arrowIcon: {

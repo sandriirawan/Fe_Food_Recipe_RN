@@ -3,19 +3,26 @@ import Home from "../home";
 import Login from "../auth/login";
 import Register from "../auth/register";
 import Upload from "../upload/upload";
-import Profile from "../Profile/[id]";
-import MyRecipes from "../Profile/myRecipes/[id]";
-import SavedRecipes from "../Profile/savedRecipes/[id]";
-import LikedRecipes from "../Profile/likedRecipes/[id]";
-import Detail from "../detail/[id]";
-import Video from "../detail/video/[id]";
-import EditProfile from "../Profile/editProfile/[id]";
-import EditRecipes from "../Profile/myRecipes/editRecipes/[id]";
+import Profile from "../Profile/index";
+import MyRecipes from "../Profile/myRecipes/index";
+import SavedRecipes from "../Profile/savedRecipes/index";
+import LikedRecipes from "../Profile/likedRecipes/index";
+import Detail from "../detail/index";
+import Video from "../detail/video/index";
+import EditProfile from "../Profile/editProfile/index";
+import EditRecipes from "../Profile/myRecipes/editRecipes/index";
 import Search from "../home/search";
+import { useEffect } from "react";
+import { LogBox } from "react-native";
 
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
+  useEffect(() => {
+    LogBox.ignoreLogs([
+      "In React 18, SSRProvider is not necessary and is a noop. You can remove it from your app.",
+    ]);
+  }, []);
   return (
     <Stack.Navigator>
       <Stack.Screen
